@@ -15,6 +15,8 @@ class Delsin:
 
     def calcular_materiais(self):
 
+        print("calculando...")
+
         area_trabalho = self.rede_obj['area_trabalho']
         specs_obj = self.rede_obj['specs_obj']
         malha_horizontal = self.rede_obj['malha_horizontal']
@@ -42,7 +44,25 @@ class Delsin:
         sw_voz = math.ceil(specs_obj['pts_voz']/24)
         sala_telecom['switches'] = sw_redes + sw_voz + sw_cftv
         sala_telecom['organizadores_frontais'] = sala_telecom['patch_panels'] + sala_telecom['switches']
-        sala_telecom['racks'] = {}
+        tamanho_total_rack = sala_telecom['switches'] + sala_telecom['patch_panels'] + sala_telecom['organizadores_frontais'] + 4
+        print(tamanho_total_rack)
+        if(not specs_obj['rack_aberto']):
+            tamanho_total_rack += 2
+        qtd_rack = 1
+        if(tamanho_total_rack <=12):
+            tamanho_rack = math.ceil(tamanho_total_rack/2) * 2
+        elif(tamanho_total_rack>12 and tamanho_total_rack <= 48):
+            tamanho_rack = math.ceil(tamanho_total_rack/4) * 4
+        else:
+            tamanho_rack = tamanho_total_rack
+            while(tamanho_rack > 48):
+                qtd_rack += 1
+                tamanho_rack = tamanho_rack / qtd_rack
+            print(qtd_rack)
+            print(tamanho_rack)
+            tamanho_rack = tamanho_total_rack / qtd_rack
+            tamanho_rack = math.ceil(tamanho_total_rack/4) * 4
+
                 
         #Miscelânea
 
@@ -70,9 +90,10 @@ class Delsin:
             opc = int(input())
         specs_obj['tam_cabos'] = opc
         print("O seu rack estará em um local fechado ou na área de trabalho? (Use 'a' ou 'f')")
-        if input() == 'a': specs_obj['rack_aberto'] = True
-        else: specs_obj['rack_aberto'] = False
-        io_util.clear()
+        if input() == 'a':
+            specs_obj['rack_aberto'] = True
+        else:
+            specs_obj['rack_aberto'] = False
 
     def novo(self):
         print("Agora eu vou te ajudar a projetar sua rede. Para isso, preciso que você me responda algumas perguntas. Vamo começar a festa?")
@@ -82,7 +103,6 @@ class Delsin:
         self.listar_materiais()
 
     def abrir(self):
-        print('abrir')
         self.listar_materiais()
         io_util.pause()
 
