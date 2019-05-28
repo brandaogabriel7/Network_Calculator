@@ -9,64 +9,73 @@ class Delsin:
         'misc': {}
     }
 
+    
     def listar_materiais(self):
         print('listar')
 
     def calcular_materiais(self):
 
-        #Área de trabalho
-        self.rede_obj['area_trabalho']['espelhos'] = self.rede_obj['specs_obj']['pts_telecom']
-        self.rede_obj['area_trabalho']['tomadas'] = int(self.rede_obj['specs_obj']['pts_rede'] + self.rede_obj['specs_obj']['pts_cftv'] + self.rede_obj['specs_obj']['pts_voz'])
-        self.rede_obj['area_trabalho']['patch_cords'] = self.rede_obj['area_trabalho']['tomadas']
-        self.rede_obj['area_trabalho']['etiquetas'] = self.rede_obj['area_trabalho']['tomadas']*2/3
+        area_trabalho = self.rede_obj['area_trabalho']
+        specs_obj = self.rede_obj['specs_obj']
+        malha_horizontal = self.rede_obj['malha_horizontal']
+        sala_telecom = self.rede_obj['sala_telecom']
+        pts_dados = specs_obj['pts_rede'] + (2 * specs_obj['pts_telecom'])
 
-        #Malha horizontal
-        self.rede_obj['malha_horizontal']['cabos_utp'] = math.ceil((self.rede_obj['area_trabalho']['tomadas']*self.rede_obj['specs_obj']['tam_cabos'])/305)
-        self.rede_obj['malha_horizontal']['etiquetas'] = 2 * self.rede_obj['area_trabalho']['tomadas']
+        area_trabalho['espelhos'] = pts_dados/2
+        area_trabalho['tomadas'] = int(pts_dados + specs_obj['pts_cftv'] + specs_obj['pts_voz'])
+        area_trabalho['patch_cords'] = area_trabalho['tomadas']
+        area_trabalho['etiquetas'] = area_trabalho['espelhos'] * 3
 
-        #Sala de telecom
-        self.rede_obj['sala_telecom']['patch_panels'] = self.rede_obj['area_trabalho']['tomadas']
-        self.rede_obj['sala_telecom']['patch_panels'] = math.ceil(self.rede_obj['sala_telecom']['patch_panels']/24)
-        pc = []
-        pc.append({'cor': 'azul', 'qtd': self.rede_obj['specs_obj']['pts_rede']})
-        pc.append({'cor': 'vermelho', 'qtd': self.rede_obj['specs_obj']['pts_cftv']})
-        pc.append({'cor': 'a', 'qtd': self.rede_obj['specs_obj']['pts_voz']}) 
-        self.rede_obj['sala_telecom']['patch_cables'] = pc
-        self.rede_obj['sala_telecom']['etiquetas_pc'] = 2 * self.rede_obj['area_trabalho']['tomadas']
-        self.rede_obj['sala_telecom']['etiquetas_pp'] = 24 * self.rede_obj['sala_telecom']['patch_panels']
-        sw_redes = math.ceil(self.rede_obj['specs_obj']['pts_rede']/24)
-        sw_cftv = math.ceil(self.rede_obj['specs_obj']['pts_cftv']/24)
-        sw_voz = math.ceil(self.rede_obj['specs_obj']['pts_voz']/24)
-        self.rede_obj['sala_telecom']['organizadores_frontais'] = self.rede_obj['sala_telecom']['patch_panels']
-        self.rede_obj['sala_telecom']['organizadores_frontais'] += sw_redes + sw_voz + sw_cftv
-        self.rede_obj['sala_telecom']['racks'] = {}
-        
-        
+        malha_horizontal['cabos_utp'] = math.ceil((area_trabalho['tomadas'] * specs_obj['tam_cabos'])/305)
+        malha_horizontal['etiquetas'] = 2 * area_trabalho['tomadas']
+
+        sala_telecom['patch_panels'] = math.ceil(area_trabalho['tomadas']/24)
+        pcable = []
+        pcable.append({'cor': 'azul', 'qtd': pts_dados})
+        pcable.append({'cor': 'vermelho', 'qtd': specs_obj['pts_cftv']})
+        pcable.append({'cor': 'amarelo', 'qtd': specs_obj['pts_voz']}) 
+        sala_telecom['patch_cables'] = pcable
+        sala_telecom['etiquetas_pcable'] = 2 * area_trabalho['tomadas']
+        sala_telecom['etiquetas_ppanel'] = 24 * sala_telecom['patch_panels']
+        sw_redes = math.ceil(pts_dados/24)
+        sw_cftv = math.ceil(specs_obj['pts_cftv']/24)
+        sw_voz = math.ceil(specs_obj['pts_voz']/24)
+        sala_telecom['switches'] = sw_redes + sw_voz + sw_cftv
+        sala_telecom['organizadores_frontais'] = sala_telecom['patch_panels'] + sala_telecom['switches']
+        sala_telecom['racks'] = {}
+                
         #Miscelânea
 
 
     def perguntar_especificacoes_da_rede(self):
+
+        specs_obj = self.rede_obj['specs_obj']
+        
         print("Digite o número de pontos de telecom da sua rede:")
-        self.rede_obj['specs_obj']['pts_telecom'] = int(input())
+        specs_obj['pts_telecom'] = int(input())
         io_util.clear()
         print("Digite o número de pontos de rede(simples):")
-        self.rede_obj['specs_obj']['pts_rede'] = int(input())
+        specs_obj['pts_rede'] = int(input())
         io_util.clear()
         print("Digite o número de pontos de CFTV IP:")
-        self.rede_obj['specs_obj']['pts_cftv'] = int(input())
+        specs_obj['pts_cftv'] = int(input())
         io_util.clear()
         print("Digite o número de pontos de voz sobre IP:")
-        self.rede_obj['specs_obj']['pts_voz'] = int(input())
+        specs_obj['pts_voz'] = int(input())
         io_util.clear()
-        print("O seu rack estará em um local fechado ou na área de trabalho?(Use 'a' ou 'f')")
-        if input() == 'a': self.rede_obj['specs_obj']['rack_aberto'] = True
-        else: self.rede_obj['specs_obj']['rack_aberto'] = False
         print("Qual será o tamanho dos cabos na malha horizontal?")
-        self.rede_obj['specs_obj']['tam_cabos'] = int(input())
+        opc = int(input())
+        while(int(opc) < 1):
+            print("O tamanho dos seus cabos não pode ser menor que 1, por favor digite um tamanho válido.")
+            opc = int(input())
+        specs_obj['tam_cabos'] = opc
+        print("O seu rack estará em um local fechado ou na área de trabalho? (Use 'a' ou 'f')")
+        if input() == 'a': specs_obj['rack_aberto'] = True
+        else: specs_obj['rack_aberto'] = False
         io_util.clear()
 
     def novo(self):
-        print("Agora eu vou te ajudar a projetar sua rede. Para isso, preciso que você me responda algumas perguntas. Vamo Começar a festa??")
+        print("Agora eu vou te ajudar a projetar sua rede. Para isso, preciso que você me responda algumas perguntas. Vamo começar a festa?")
         io_util.pause()
         self.perguntar_especificacoes_da_rede()
         self.calcular_materiais()
@@ -74,6 +83,7 @@ class Delsin:
 
     def abrir(self):
         print('abrir')
+        self.listar_materiais()
         io_util.pause()
 
     def salvar(self):
@@ -116,7 +126,7 @@ class Delsin:
             self.mostrar_menu()
             opt = input()
             func = self.handle_opt(int(opt))
-            func(self)    
+            func(self) 
 
 
 Delsin()
