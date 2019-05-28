@@ -9,9 +9,6 @@ class Delsin:
         'misc': {}
     }
 
-    
-    def listar_materiais(self):
-        print('listar')
 
     def calcular_materiais(self):
 
@@ -63,11 +60,18 @@ class Delsin:
             print(tamanho_rack)
             tamanho_rack = tamanho_total_rack / qtd_rack
             tamanho_rack = math.ceil(tamanho_total_rack/4) * 4
+        sala_telecom['rack'] = {}
+        sala_telecom['rack']['tamanho'] = tamanho_rack
+        sala_telecom['rack']['qtd'] = qtd_rack
 
         print(tamanho_rack)
-
                 
         #Miscelânea
+
+    
+    def listar_materiais(self):
+
+        print("Listando materiais...")
 
 
     def perguntar_especificacoes_da_rede(self):
