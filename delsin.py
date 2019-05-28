@@ -72,6 +72,8 @@ class Delsin:
     def listar_materiais(self):
 
         print("Listando materiais...")
+        print("Área de trabalho:")
+        print("\t-\tTomadas fêmea RJ-45: ", self.rede_obj['area_trabalho']['tomadas'])
 
 
     def perguntar_especificacoes_da_rede(self):
@@ -110,7 +112,7 @@ class Delsin:
         self.listar_materiais()
 
     def abrir(self):
-        self.listar_materiais()
+        print('abrir')
         io_util.pause()
 
     def salvar(self):
@@ -129,9 +131,11 @@ class Delsin:
         io_util.clear()
         print("Como posso ajudar?")
         print("1. Novo cálculo de rede")
-        print("2. Abrir")
-        print("3. Salvar")
-        print("4. Salvar como...")
+        print("2. Listar materiais")
+        print("3. Abrir")
+        print("4. Salvar")
+        print("5. Salvar como...")
+        print("6. Testar cálculo de materiais")
         print("0. Sair")
 
     def handle_opt(self, opt):
@@ -139,10 +143,11 @@ class Delsin:
 
     menu_options = {
         1: novo,
-        2: abrir,
-        3: salvar,
-        4: salvar_como,
-        5: calcular_materiais,
+        2: listar_materiais,
+        3: abrir,
+        4: salvar,
+        5: salvar_como,
+        6: calcular_materiais,
         0: sair
     }
 
