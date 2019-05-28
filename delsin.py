@@ -21,10 +21,9 @@ class Delsin:
         specs_obj = self.rede_obj['specs_obj']
         malha_horizontal = self.rede_obj['malha_horizontal']
         sala_telecom = self.rede_obj['sala_telecom']
-        pts_dados = specs_obj['pts_rede'] + (2 * specs_obj['pts_telecom'])
 
-        area_trabalho['espelhos'] = pts_dados/2
-        area_trabalho['tomadas'] = int(pts_dados + specs_obj['pts_cftv'] + specs_obj['pts_voz'])
+        area_trabalho['espelhos'] = specs_obj['pts_telecom'] + specs_obj['pts_rede']/2
+        area_trabalho['tomadas'] = int(specs_obj['pts_rede'] + (2 * specs_obj['pts_telecom']) + specs_obj['pts_cftv'] + specs_obj['pts_voz'])
         area_trabalho['patch_cords'] = area_trabalho['tomadas']
         area_trabalho['etiquetas'] = area_trabalho['espelhos'] * 3
 
@@ -33,19 +32,21 @@ class Delsin:
 
         sala_telecom['patch_panels'] = math.ceil(area_trabalho['tomadas']/24)
         pcable = []
-        pcable.append({'cor': 'azul', 'qtd': pts_dados})
+        pcable.append({'cor': 'azul', 'qtd': specs_obj['pts_rede'] + (2 * specs_obj['pts_telecom'])})
         pcable.append({'cor': 'vermelho', 'qtd': specs_obj['pts_cftv']})
         pcable.append({'cor': 'amarelo', 'qtd': specs_obj['pts_voz']}) 
         sala_telecom['patch_cables'] = pcable
         sala_telecom['etiquetas_pcable'] = 2 * area_trabalho['tomadas']
         sala_telecom['etiquetas_ppanel'] = 24 * sala_telecom['patch_panels']
-        sw_redes = math.ceil(pts_dados/24)
+        sw_redes = math.ceil(specs_obj['pts_rede'] + ((2 * specs_obj['pts_telecom'])/24))
         sw_cftv = math.ceil(specs_obj['pts_cftv']/24)
         sw_voz = math.ceil(specs_obj['pts_voz']/24)
         sala_telecom['switches'] = sw_redes + sw_voz + sw_cftv
         sala_telecom['organizadores_frontais'] = sala_telecom['patch_panels'] + sala_telecom['switches']
         tamanho_total_rack = sala_telecom['switches'] + sala_telecom['patch_panels'] + sala_telecom['organizadores_frontais'] + 4
+        
         print(tamanho_total_rack)
+
         if(not specs_obj['rack_aberto']):
             tamanho_total_rack += 2
         qtd_rack = 1
@@ -62,6 +63,8 @@ class Delsin:
             print(tamanho_rack)
             tamanho_rack = tamanho_total_rack / qtd_rack
             tamanho_rack = math.ceil(tamanho_total_rack/4) * 4
+
+        print(tamanho_rack)
 
                 
         #Miscelânea
@@ -135,6 +138,7 @@ class Delsin:
         2: abrir,
         3: salvar,
         4: salvar_como,
+        5: calcular_materiais,
         0: sair
     }
 
