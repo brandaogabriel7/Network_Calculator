@@ -1,4 +1,5 @@
 import math, io_util
+import JSONFileHandler as jfh
  
 class Delsin:
     rede_obj = {
@@ -8,6 +9,8 @@ class Delsin:
         'sala_telecom': {},
         'misc': {}
     }
+
+    curr_filename = None
 
 
     def calcular_materiais(self):
@@ -71,7 +74,7 @@ class Delsin:
 
     
     def listar_materiais(self):
-
+        io_util.clear()
         area_trabalho = self.rede_obj['area_trabalho']
         specs_obj = self.rede_obj['specs_obj']
         malha_horizontal = self.rede_obj['malha_horizontal']
@@ -105,6 +108,7 @@ class Delsin:
         io_util.clear()
         print("Qual será o tamanho dos cabos na malha horizontal?")
         opc = int(input())
+        io_util.clear()
         while(int(opc) < 1):
             print("O tamanho dos seus cabos não pode ser menor que 1, por favor digite um tamanho válido.")
             opc = int(input())
@@ -114,6 +118,7 @@ class Delsin:
             specs_obj['rack_aberto'] = True
         else:
             specs_obj['rack_aberto'] = False
+        io_util.clear()
 
     def novo(self):
         print("Agora eu vou te ajudar a projetar sua rede. Para isso, preciso que você me responda algumas perguntas. Vamo começar a festa?")
@@ -123,16 +128,22 @@ class Delsin:
         self.listar_materiais()
 
     def abrir(self):
-        print('abrir')
+        print('Digite o nome do arquivo que deseja abrir:')
+        self.curr_filename = input()
+        self.rede_obj = jfh.read_json(self.curr_filename)
+        self.listar_materiais()
         io_util.pause()
 
     def salvar(self):
-        print('salvar')
-        io_util.pause()
+        if self.curr_filename != None:
+            jfh.save_json(self.curr_filename, self.rede_obj)
+        else:
+            self.salvar_como()
 
     def salvar_como(self):
-        print('salvar como...')
-        io_util.pause()
+        print("Digite o nome que deseja salvar seu arquivo:")
+        self.curr_filename = input()
+        jfh.save_json(self.curr_filename, self.rede_obj)
 
     def sair(self):
         print("Saindo...")
@@ -167,6 +178,7 @@ class Delsin:
         while(int(opt) != 0):
             self.mostrar_menu()
             opt = input()
+            io_util.clear()
             func = self.handle_opt(int(opt))
             func(self) 
 
