@@ -67,7 +67,7 @@ class Delsin:
         self.malha_horizontal['etiquetas'] = 2 * self.area_trabalho['tomadas']
 
         switches = math.ceil(self.specs_obj['pts_rede'] + ((2 * self.specs_obj['pts_telecom'])/24))
-        self.sala_telecom['switches'] = sw_redes + sw_voz + sw_cftv
+        self.sala_telecom['switches'] = switches
         self.sala_telecom['patch_panels'] = switches
         pcable = []
         pcable.append({'cor': 'azul', 'qtd': (self.specs_obj['pts_rede'] + (2 * self.specs_obj['pts_telecom']) - self.specs_obj['pts_cftv'] - self.specs_obj['pts_voz'])})
@@ -125,7 +125,7 @@ class Delsin:
 
         print("Sala de Telecomunicações:")
         print(" - Patch Panels: ", self.sala_telecom['patch_panels'])
-        print("\tEtiquetas: ", self.sala_telecom['pts_voz'], "U")
+        print("\tEtiquetas: ", self.sala_telecom['etiquetas'], "U")
         print(" - Patch Cables: ", self.sala_telecom['tomadas'])
         print("\tEtiquetas: ", self.sala_telecom['pts_voz'], "U")
         print(" - Organizadores frontais: ", self.sala_telecom['tomadas'])
