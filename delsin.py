@@ -12,38 +12,40 @@ class Delsin:
 
     def calcular_materiais(self):
 
-        print("calculando...")
+        print("Calculando...")
 
         area_trabalho = self.rede_obj['area_trabalho']
         specs_obj = self.rede_obj['specs_obj']
         malha_horizontal = self.rede_obj['malha_horizontal']
         sala_telecom = self.rede_obj['sala_telecom']
 
-        area_trabalho['espelhos'] = specs_obj['pts_telecom'] + specs_obj['pts_rede']/2
+        area_trabalho['espelhos'] = specs_obj['pts_telecom'] + specs_obj['pts_rede']/2 + math.ceil(specs_obj['pts_cftv']/2) + math.ceil(specs_obj['pts_voz']/2)
         area_trabalho['tomadas'] = int(specs_obj['pts_rede'] + (2 * specs_obj['pts_telecom']) + specs_obj['pts_cftv'] + specs_obj['pts_voz'])
         area_trabalho['patch_cords'] = area_trabalho['tomadas']
-        area_trabalho['etiquetas'] = area_trabalho['espelhos'] * 3
+        area_trabalho['etiquetas'] = area_trabalho['tomadas'] + area_trabalho['espelhos']
 
         malha_horizontal['cabos_utp'] = math.ceil((area_trabalho['tomadas'] * specs_obj['tam_cabos'])/305)
         malha_horizontal['etiquetas'] = 2 * area_trabalho['tomadas']
 
-        sala_telecom['patch_panels'] = math.ceil(area_trabalho['tomadas']/24)
-        pcable = []
-        pcable.append({'cor': 'azul', 'qtd': specs_obj['pts_rede'] + (2 * specs_obj['pts_telecom'])})
-        pcable.append({'cor': 'vermelho', 'qtd': specs_obj['pts_cftv']})
-        pcable.append({'cor': 'amarelo', 'qtd': specs_obj['pts_voz']}) 
-        sala_telecom['patch_cables'] = pcable
-        sala_telecom['etiquetas_pcable'] = 2 * area_trabalho['tomadas']
-        sala_telecom['etiquetas_ppanel'] = 24 * sala_telecom['patch_panels']
         sw_redes = math.ceil(specs_obj['pts_rede'] + ((2 * specs_obj['pts_telecom'])/24))
         sw_cftv = math.ceil(specs_obj['pts_cftv']/24)
         sw_voz = math.ceil(specs_obj['pts_voz']/24)
         sala_telecom['switches'] = sw_redes + sw_voz + sw_cftv
-        sala_telecom['organizadores_frontais'] = sala_telecom['patch_panels'] + sala_telecom['switches']
-        tamanho_total_rack = sala_telecom['switches'] + sala_telecom['patch_panels'] + sala_telecom['organizadores_frontais'] + 4
-        
-        print(tamanho_total_rack)
-
+        ppanel = {}
+        ppanel['dados'] = sw_redes
+        ppanel['voz'] = sw_voz
+        ppanel['cftv'] = sw_cftv
+        sala_telecom['patch_panels'] = ppanel
+        total_ppanel = sala_telecom['patch_panels']['dados'] + sala_telecom['patch_panels']['cftv'] + sala_telecom['patch_panels']['voz']
+        pcable = []
+        pcable.append({'cor': 'azul', 'qtd': (specs_obj['pts_rede'] + (2 * specs_obj['pts_telecom']))})
+        pcable.append({'cor': 'vermelho', 'qtd': specs_obj['pts_cftv']})
+        pcable.append({'cor': 'amarelo', 'qtd': specs_obj['pts_voz']}) 
+        sala_telecom['patch_cables'] = pcable
+        sala_telecom['etiquetas_pcable'] = 2 * area_trabalho['tomadas']
+        sala_telecom['etiquetas_ppanel'] = 24 * (total_ppanel)
+        sala_telecom['organizadores_frontais'] = total_ppanel + sala_telecom['switches']
+        tamanho_total_rack = int(sala_telecom['switches'] + total_ppanel + sala_telecom['organizadores_frontais'] + 4)
         if(not specs_obj['rack_aberto']):
             tamanho_total_rack += 2
         qtd_rack = 1
@@ -56,25 +58,34 @@ class Delsin:
             while(tamanho_rack > 48):
                 qtd_rack += 1
                 tamanho_rack = tamanho_rack / qtd_rack
-            print(qtd_rack)
-            print(tamanho_rack)
             tamanho_rack = tamanho_total_rack / qtd_rack
-            tamanho_rack = math.ceil(tamanho_total_rack/4) * 4
+            tamanho_rack = math.ceil(tamanho_rack/4) * 4
         sala_telecom['rack'] = {}
         sala_telecom['rack']['tamanho'] = tamanho_rack
         sala_telecom['rack']['qtd'] = qtd_rack
 
-        print(tamanho_rack)
+        io_util.pause()
+        
                 
         #Miscelânea
 
     
     def listar_materiais(self):
 
+        area_trabalho = self.rede_obj['area_trabalho']
+        specs_obj = self.rede_obj['specs_obj']
+        malha_horizontal = self.rede_obj['malha_horizontal']
+        sala_telecom = self.rede_obj['sala_telecom']
+
         print("Listando materiais...")
         print("Área de trabalho:")
-        print("\t-\tTomadas fêmea RJ-45: ", self.rede_obj['area_trabalho']['tomadas'])
-
+        print(" - Tomadas fêmea RJ-45: ", area_trabalho['tomadas'])
+        print("\tTomadas fêmea de dados (cat 6a): ", ((2*specs_obj['pts_telecom']) + specs_obj['pts_rede']))
+        print("\tTomadas fêmea de CFTV (cat 6): ", specs_obj['pts_cftv'])
+        print("\tTomadas fêmea de voz sobre IP (cat 5e): ", specs_obj['pts_voz'])
+        
+        io_util.pause()
+        
 
     def perguntar_especificacoes_da_rede(self):
 
@@ -135,7 +146,6 @@ class Delsin:
         print("3. Abrir")
         print("4. Salvar")
         print("5. Salvar como...")
-        print("6. Testar cálculo de materiais")
         print("0. Sair")
 
     def handle_opt(self, opt):
@@ -147,7 +157,6 @@ class Delsin:
         3: abrir,
         4: salvar,
         5: salvar_como,
-        6: calcular_materiais,
         0: sair
     }
 
