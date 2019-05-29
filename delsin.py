@@ -57,8 +57,8 @@ class Delsin:
 
         print("Calculando...")
 
-        self.area_trabalho['espelhos_duplos'] = self.specs_obj['pts_telecom'])
-        self.area_trabalho['espelhos_simples'] = self.specs_obj['pts_rede'])
+        self.area_trabalho['espelhos_duplos'] = self.specs_obj['pts_telecom']
+        self.area_trabalho['espelhos_simples'] = self.specs_obj['pts_rede']
         self.area_trabalho['tomadas'] = int(self.specs_obj['pts_rede'] + (2 * self.specs_obj['pts_telecom']))
         self.area_trabalho['patch_cords'] = self.area_trabalho['tomadas']
         self.area_trabalho['etiquetas'] = self.area_trabalho['tomadas'] + self.area_trabalho['espelhos_simples'] + self.area_trabalho['espelhos_duplos']
@@ -124,7 +124,7 @@ class Delsin:
         print(" - Etiquetas: ", self.malha_horizontal['etiquetas'])
 
         print("Sala de Telecomunicações:")
-        print(" - Patch Panels: ", self.sala_telecom['tomadas'])
+        print(" - Patch Panels: ", self.sala_telecom['patch_panels'])
         print("\tEtiquetas: ", self.sala_telecom['pts_voz'], "U")
         print(" - Patch Cables: ", self.sala_telecom['tomadas'])
         print("\tEtiquetas: ", self.sala_telecom['pts_voz'], "U")
