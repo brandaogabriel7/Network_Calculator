@@ -17,6 +17,7 @@ class Delsin:
     specs_obj = {}
     malha_horizontal = {}
     sala_telecom = {}
+    misc = {}
          
 
     def perguntar_especificacoes_da_rede(self):
@@ -101,6 +102,11 @@ class Delsin:
         
                 
         #Miscelânea
+        self.misc['porca_gaiola'] = 4 * self.sala_telecom['rack']['tamanho'] * self.sala_telecom['rack']['qtd']
+        self.misc['abrc_plastica'] = self.sala_telecom['rack']['qtd']
+        self.misc['abrc_velcro'] = 3 * self.sala_telecom['rack']['qtd']
+        self.misc['filtro_linha'] = self.sala_telecom['switches'] + 2 * self.sala_telecom['rack']['qtd']
+        self.misc['kit_rodizio'] = self.sala_telecom['rack']['qtd']
 
     
     def listar_materiais(self):
