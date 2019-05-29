@@ -139,12 +139,12 @@ class Delsin:
         print("\tQuantidade: ", self.sala_telecom['rack']['qtd'])
 
         print("Miscelânea:")
-        if(not self.specs_obj['rack_aberto'])
-            print(" - Kit rodízio: ", self.area_trabalho['tomadas'])
-        print(" - Porta gaiola: ", self.area_trabalho['tomadas'])
-        print(" - Abraçadeiras plásticas: ", self.area_trabalho['tomadas'])
-        print(" - Abraçadeiras de velcro: ", self.area_trabalho['tomadas'])
-        print(" - Filtro de linha: ", self.area_trabalho['tomadas'])
+        if(not self.specs_obj['rack_aberto']):
+            print(" - Kit rodízio: ", self.misc['kit_rodizio'])
+        print(" - Porca gaiola: ", self.misc['porca_gaiola'])
+        print(" - Abraçadeiras plásticas (pacote de 100 unidades): ", self.misc['abrc_plastica'])
+        print(" - Abraçadeiras de velcro (em metros): ", self.misc['abrc_velcro'])
+        print(" - Filtro de linha: ", self.misc['filtro_linha'])
 
         
         io_util.pause()
