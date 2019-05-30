@@ -46,11 +46,11 @@ class Delsin:
             print("O tamanho dos seus cabos não pode ser menor que 1, por favor digite um tamanho válido.")
             opc = int(input())
         self.specs_obj['tam_cabos'] = opc
-        print("O seu rack estará em um local fechado ou na área de trabalho? (Use 'a' ou 'f')")
+        print("O seu rack estará em um local fechado ou na área de trabalho? (Use 'f' ou 'a')")
         if input() == 'a':
-            self.specs_obj['rack_aberto'] = True
-        else:
             self.specs_obj['rack_aberto'] = False
+        else:
+            self.specs_obj['rack_aberto'] = True
         io_util.clear()
 
 
@@ -67,9 +67,8 @@ class Delsin:
         self.malha_horizontal['cabos_utp'] = math.ceil((self.area_trabalho['tomadas'] * self.specs_obj['tam_cabos'])/305)
         self.malha_horizontal['etiquetas'] = 2 * self.area_trabalho['tomadas']
 
-        switches = math.ceil(self.specs_obj['pts_rede'] + ((2 * self.specs_obj['pts_telecom'])/24))
-        self.sala_telecom['switches'] = switches
-        self.sala_telecom['patch_panels'] = switches
+        self.sala_telecom['switches'] = math.ceil((self.specs_obj['pts_rede'] + (2 * self.specs_obj['pts_telecom']))/24)
+        self.sala_telecom['patch_panels'] = self.sala_telecom['switches']
         pcable = []
         pcable.append({'cor': 'azul', 'qtd': (self.specs_obj['pts_rede'] + (2 * self.specs_obj['pts_telecom']) - self.specs_obj['pts_cftv'] - self.specs_obj['pts_voz'])})
         pcable.append({'cor': 'vermelho', 'qtd': self.specs_obj['pts_cftv']})
@@ -78,35 +77,40 @@ class Delsin:
         self.sala_telecom['etiquetas_pcable'] = 2 * self.area_trabalho['tomadas']
         self.sala_telecom['etiquetas_ppanel'] = 24 * (self.sala_telecom['patch_panels'])
         self.sala_telecom['organizadores_frontais'] = self.sala_telecom['patch_panels'] + self.sala_telecom['switches']
-        tamanho_total_rack = int(self.sala_telecom['switches'] + self.sala_telecom['patch_panels'] + self.sala_telecom['organizadores_frontais'] + 4)
-        if(not self.specs_obj['rack_aberto']):
-            tamanho_total_rack += 2
-        tamanho_total_rack = tamanho_total_rack * 3/2
+        tamanho_total_rack = int(self.sala_telecom['switches'] + self.sala_telecom['patch_panels'] + self.sala_telecom['organizadores_frontais'])
+        tamanho_unit_rack = tamanho_total_rack 
         qtd_rack = 1
-        if(tamanho_total_rack <=12):
-            tamanho_rack = math.ceil(tamanho_total_rack/2) * 2
-        elif(tamanho_total_rack>12 and tamanho_total_rack <= 48):
-            tamanho_rack = math.ceil(tamanho_total_rack/4) * 4
+        if(self.specs_obj['rack_aberto']):
+            qtd_exaust = 0
+            exaustor = 0
         else:
-            tamanho_rack = tamanho_total_rack
-            while(tamanho_rack > 48):
-                qtd_rack += 1
-                tamanho_rack = tamanho_rack / qtd_rack
-            tamanho_rack = tamanho_total_rack / qtd_rack
-            tamanho_rack = math.ceil(tamanho_rack/4) * 4
-        self.sala_telecom['rack'] = {}
-        self.sala_telecom['rack']['tamanho'] = tamanho_rack
-        self.sala_telecom['rack']['qtd'] = qtd_rack
-
-        io_util.pause()
+            qtd_exaust = 1
+            exaustor = 2
         
+        while(((tamanho_unit_rack + exaustor + 4) * 3/2) > 48):
+            qtd_rack += 1
+            print("while")
+            if(not self.specs_obj['rack_aberto']):
+                qtd_exaust = qtd_rack
+            tamanho_unit_rack = tamanho_total_rack / qtd_rack
+        tamanho_unit_rack = (tamanho_unit_rack + exaustor + 4) * 3/2
+        if(tamanho_unit_rack <= 12):
+            tamanho_unit_rack = math.ceil((tamanho_total_rack+4)/2) * 2
+        elif(tamanho_unit_rack > 12 and tamanho_unit_rack <= 48):
+            tamanho_unit_rack = math.ceil((tamanho_total_rack+4)/4) * 4
+        else:
+            tamanho_unit_rack = math.ceil(tamanho_unit_rack/4) * 4
+        self.sala_telecom['rack'] = {}
+        self.sala_telecom['rack']['tamanho'] = tamanho_unit_rack
+        self.sala_telecom['rack']['qtd'] = qtd_rack        
                 
-        #Miscelânea
         self.misc['porca_gaiola'] = 4 * self.sala_telecom['rack']['tamanho'] * self.sala_telecom['rack']['qtd']
         self.misc['abrc_plastica'] = self.sala_telecom['rack']['qtd']
         self.misc['abrc_velcro'] = 3 * self.sala_telecom['rack']['qtd']
         self.misc['filtro_linha'] = self.sala_telecom['switches'] + 2 * self.sala_telecom['rack']['qtd']
         self.misc['kit_rodizio'] = self.sala_telecom['rack']['qtd']
+
+        io_util.pause()
 
     
     def listar_materiais(self):
@@ -132,11 +136,11 @@ class Delsin:
         print("Sala de Telecomunicações:")
         print(" - Patch Panels: ", self.sala_telecom['patch_panels'])
         print("\tEtiquetas: ", self.sala_telecom['etiquetas_ppanel'])
-        print(" - Patch Cables: ", self.sala_telecom['patch-cables'])
+        print(" - Patch Cables:")
         print("\tEtiquetas: ", self.sala_telecom['etiquetas_pcable'])
-        print("\tDados: ", self.sala_telecom['pcable'][0]['qtd'], " - cor: ", self.sala_telecom['pcable'][0]['cor'])
-        print("\tCFTV: ", self.sala_telecom['pcable'][1]['qtd'], " - cor: ", self.sala_telecom['pcable'][1]['cor'])
-        print("\tVoz: ", self.sala_telecom['pcable'][2]['qtd'], " - cor: ", self.sala_telecom['pcable'][2]['cor'])
+        print("\tDados: ", self.sala_telecom['patch_cables'][0]['qtd'], " - cor: ", self.sala_telecom['patch_cables'][0]['cor'])
+        print("\tCFTV: ", self.sala_telecom['patch_cables'][1]['qtd'], " - cor: ", self.sala_telecom['patch_cables'][1]['cor'])
+        print("\tVoz: ", self.sala_telecom['patch_cables'][2]['qtd'], " - cor: ", self.sala_telecom['patch_cables'][2]['cor'])
         print(" - Organizadores frontais: ", self.sala_telecom['organizadores_frontais'])
         if(self.specs_obj['rack_aberto']):
             print(" - Organizadores laterais: ", (2 * self.sala_telecom['rack']['tamanho'] * self.sala_telecom['rack']['qtd']))
